@@ -1,0 +1,21 @@
+name: test
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: add comment
+        uses: ./
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          identifier: hello
+          body: |
+            **hello**
+          file: Makefile
+          file-type: makefile
+          masks: "${{ toJson(secrets) }}"
