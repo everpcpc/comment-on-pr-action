@@ -1,0 +1,31 @@
+name: Create/Update Comment on Pull Request
+description: Create/Update Comment on Pull Request
+author: everpcpc
+
+inputs:
+  token:
+    description: GitHub Token
+    required: true
+  body:
+    description: Comment content
+    required: true
+  file:
+    description: Additional comment content from file
+    required: false
+  file-type:
+    description: "Content Type for file to show as code, eg: diff"
+    required: false
+  identifier:
+    description: Comment body filter
+    required: true
+  masks:
+    description: "secrets dict to mask in comment, eg: toJson(secrets)"
+    required: false
+
+runs:
+  using: node16
+  main: dist/index.js
+
+branding:
+  icon: message-circle
+  color: green
