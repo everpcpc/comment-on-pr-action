@@ -19,7 +19,7 @@ inputs:
     description: Comment body filter
     required: true
   masks:
-    description: "secrets dict to mask in comment, eg: toJson(secrets)"
+    description: "comma separated secrets to mask in comment, eg: join(secrets.*)"
     required: false
   allow-failure:
     description: allow failure for comment

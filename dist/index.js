@@ -8956,9 +8956,11 @@ async function run() {
 
         const masks = core.getInput('masks');
         if (masks) {
-            const obj = JSON.parse(masks);
-            for (let ss in obj) {
-                body = body.replace(obj[ss].trim(), '***');
+            const ms = masks.split(',');
+            for (let ss in ms) {
+                if (ss.trim() !== '') {
+                    body = body.replace(ss.trim(), '***');
+                }
             }
         }
 
