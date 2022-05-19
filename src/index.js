@@ -30,12 +30,15 @@ async function run() {
         }
 
         const masks = core.getInput('masks');
+        const masksSplit = core.getInput('masks-split');
         if (masks) {
-            const ms = masks.split(',');
-            for (let ss in ms) {
-                if (ss.trim() !== '') {
-                    body = body.replace(ss.trim(), '***');
-                }
+            let ms = masks.split(masksSplit);
+            let ss = ms.map(m => m.trim()).filter(m => m);
+            ss.sort(function (a, b) {
+                return b.length - a.length;
+            });
+            for (let s in ss) {
+                body = body.replace(s, '***');
             }
         }
 
