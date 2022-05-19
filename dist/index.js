@@ -8963,7 +8963,7 @@ async function run() {
                 return b.length - a.length;
             });
             for (let s in ss) {
-                body = body.replace(s, '***');
+                body = body.replaceAll(ss[s], '***');
             }
         }
 
