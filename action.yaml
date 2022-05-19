@@ -21,6 +21,10 @@ inputs:
   masks:
     description: "secrets dict to mask in comment, eg: toJson(secrets)"
     required: false
+  allow-failure:
+    description: allow failure for comment
+    required: false
+    default: "true"
 
 runs:
   using: node16

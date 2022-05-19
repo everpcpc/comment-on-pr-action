@@ -11,7 +11,6 @@ const token = core.getInput('token');
 const octokit = new Octokit({ auth: `token ${token}` });
 const context = github.context;
 
-
 async function run() {
     try {
         const owner = context.repo.owner;
@@ -113,7 +112,12 @@ async function run() {
         }
 
     } catch (error) {
-        core.setFailed(error.message);
+        const allowFailure = core.getInput('allow-failure');
+        if (allowFailure === 'true') {
+            core.error(error.message);
+        } else {
+            core.setFailed(error.message);
+        }
     }
 }
 
