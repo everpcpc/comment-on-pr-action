@@ -9,11 +9,14 @@ inputs:
   body:
     description: Comment content
     required: true
-  file:
-    description: Additional comment content from file
+  files:
+    description: Additional comment content from file, split by comma
     required: false
-  file-type:
-    description: "Content Type for file to show as code, eg: diff"
+  file-types:
+    description: "Content Type for file to show as code, split by comma, null for not code eg: diff"
+    required: false
+  file-names:
+    description: collapse with title, split by comma, null for expand
     required: false
   identifier:
     description: Comment body filter
