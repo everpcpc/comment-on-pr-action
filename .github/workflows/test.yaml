@@ -16,6 +16,7 @@ jobs:
           identifier: hello
           body: |
             **hello**
-          file: Makefile
-          file-type: makefile
+          files: Makefile,README.md
+          file-types: makefile,null
+          file-titles: makefile,null
           masks: "${{ toJson(secrets) }}"

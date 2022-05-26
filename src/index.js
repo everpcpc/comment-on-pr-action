@@ -18,14 +18,30 @@ async function run() {
 
         let body = core.getInput('body');
 
-        const file = core.getInput('file');
-        if (file) {
-            const content = fs.readFileSync(file, 'utf8');
-            const fileType = core.getInput('file-type');
-            if (fileType) {
-                body += "\n```" + fileType + "\n" + content + "```";
-            } else {
-                body += `\n${content}`;
+        const files = core.getInput('files').split(',');
+        const fileTypes = core.getInput('file-types').split(',');
+        const fileTitles = core.getInput('file-titles').split(',');
+        if (!(files.length === fileTypes.length && files.length === fileTitles.length)) {
+            throw new Error(`files(${files.length}), file-types(${fileTypes.length}) and file-titles(${fileTitles.length}) must have the same length`);
+        }
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                const content = fs.readFileSync(files[i], 'utf8');
+                if (fileTitles[i] !== 'null') {
+                    body += `\n\n<details>\n<summary>Click to Expand <strong>${fileTitles[i]}</strong></summary>\n`;
+                } else {
+                    body += '\n';
+                }
+
+                if (fileTypes[i] !== 'null') {
+                    body += "\n```" + fileTypes[i] + "\n" + content + "```";
+                } else {
+                    body += `\n${content}`;
+                }
+
+                if (fileTitles[i] !== 'null') {
+                    body += `\n</details>`;
+                }
             }
         }
 
