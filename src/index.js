@@ -27,19 +27,19 @@ async function run() {
         if (files.length > 0) {
             for (let i = 0; i < files.length; i++) {
                 const content = fs.readFileSync(files[i], 'utf8');
-                if (fileTitles[i] !== 'null') {
+                if (fileTitles[i]) {
                     body += `\n\n<details>\n<summary>Click to Expand <strong>${fileTitles[i]}</strong></summary>\n`;
                 } else {
                     body += '\n';
                 }
 
-                if (fileTypes[i] !== 'null') {
-                    body += "\n```" + fileTypes[i] + "\n" + content + "```";
+                if (fileTypes[i]) {
+                    body += "\n```" + fileTypes[i] + "\n" + content + "\n```";
                 } else {
                     body += `\n${content}`;
                 }
 
-                if (fileTitles[i] !== 'null') {
+                if (fileTitles[i]) {
                     body += `\n</details>`;
                 }
             }
