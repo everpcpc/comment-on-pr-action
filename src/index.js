@@ -10,6 +10,7 @@ const { Octokit } = require('@octokit/rest');
 const token = core.getInput('token');
 const octokit = new Octokit({ auth: `token ${token}` });
 const context = github.context;
+const contentCollapseLines = 36;
 
 async function run() {
     try {
@@ -27,24 +28,33 @@ async function run() {
         if (files.length > 0) {
             for (let i = 0; i < files.length; i++) {
                 const content = fs.readFileSync(files[i], 'utf8');
-                if (!content) {
-                    body += `\n\n<strong>${fileTitles[i]}</strong>\n`;
-                    continue
-                }
-                if (fileTitles[i]) {
-                    body += `\n\n<details>\n<summary>Click to Expand <strong>${fileTitles[i]}</strong></summary>\n`;
+                const lines = content.split('\n');
+                const collapse = lines.length > contentCollapseLines;
+                const hasTitle = fileTitles[i] !== '';
+                const hasType = fileTypes[i] !== '';
+
+                if (hasTitle) {
+                    if (collapse) {
+                        body += `\n\n<details>\n<summary> 💡 Click to Expand <strong>${fileTitles[i]}</strong></summary>\n`;
+                    } else {
+                        body += `\n\n<strong>${fileTitles[i]}</strong>\n`;
+                    }
                 } else {
                     body += '\n';
                 }
 
-                if (fileTypes[i]) {
+                if (hasType) {
                     body += "\n```" + fileTypes[i] + "\n" + content + "\n```";
                 } else {
                     body += `\n${content}`;
                 }
 
-                if (fileTitles[i]) {
-                    body += `\n</details>`;
+                if (hasTitle) {
+                    if (collapse) {
+                        body += `\n</details>`;
+                    } else {
+                        body += `\n`;
+                    }
                 }
             }
         }
