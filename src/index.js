@@ -27,6 +27,10 @@ async function run() {
         if (files.length > 0) {
             for (let i = 0; i < files.length; i++) {
                 const content = fs.readFileSync(files[i], 'utf8');
+                if (!content) {
+                    body += `\n\n<strong>${fileTitles[i]}</strong>\n`;
+                    continue
+                }
                 if (fileTitles[i]) {
                     body += `\n\n<details>\n<summary>Click to Expand <strong>${fileTitles[i]}</strong></summary>\n`;
                 } else {
