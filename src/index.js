@@ -15,6 +15,7 @@ const contentCollapseLines = 36;
 async function comment() {
     const owner = context.repo.owner;
     const repo = context.repo.repo;
+    core.info(`Checking with owner: ${owner}, repo: ${repo}`);
 
     let body = core.getInput('body');
 
@@ -77,11 +78,11 @@ async function comment() {
     body += "\n" + identifierDoc;
 
     if (!context.eventName.includes('pull_request')) {
-        core.info(`current context ${context.eventName} is not pull_request, skipping comment`);
+        core.info(`Current context ${context.eventName} is not pull_request, skipping comment`);
         return false;
     }
     number = context.payload.pull_request.number;
-
+    core.info(`PR number: ${number}`);
 
     async function listComments(page = 1) {
         let { data: comments } = await octokit.issues.listComments({
@@ -116,7 +117,7 @@ async function comment() {
             issue_number: number,
             body,
         });
-        core.info(`create-comment success!`);
+        core.info(`Create comment success!`);
         core.setOutput('comment-id', data.id);
     } else if (comments.length === 1) {
         let commentId = comments[0].id;
@@ -126,7 +127,7 @@ async function comment() {
                 repo,
                 comment_id: commentId,
             });
-            core.info(`delete-comment: [${commentId}] success!`);
+            core.info(`Delete comment: [${commentId}] success!`);
             return false;
         }
 
@@ -139,7 +140,7 @@ async function comment() {
 
         await octokit.issues.updateComment(params);
         core.setOutput('comment-id', commentId);
-        core.info(`update-comment: [${commentId}] success!`);
+        core.info(`Update comment: [${commentId}] success!`);
     } else {
         let length = comments.length;
         core.info(`The comments length is ${length}.`);
