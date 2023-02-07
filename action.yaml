@@ -3,6 +3,9 @@ description: Create/Update Comment on Pull Request
 author: everpcpc
 
 inputs:
+  number:
+    description: Pull Requst Number
+    required: false
   token:
     description: GitHub Token
     required: true

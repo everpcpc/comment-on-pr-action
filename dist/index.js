@@ -11914,10 +11914,6 @@ const context = github.context;
 const contentCollapseLines = 36;
 
 async function comment() {
-    const owner = context.repo.owner;
-    const repo = context.repo.repo;
-    core.info(`Checking with owner: ${owner}, repo: ${repo}`);
-
     let body = core.getInput('body');
 
     const files = core.getInput('files').split(',');
@@ -11978,12 +11974,18 @@ async function comment() {
 
     body += "\n" + identifierDoc;
 
-    if (!context.eventName.includes('pull_request')) {
-        core.info(`Current context ${context.eventName} is not pull_request, skipping comment`);
-        return false;
+    const owner = context.repo.owner;
+    const repo = context.repo.repo;
+
+    let number = core.getInput('number');
+    if (!number) {
+        if (!context.eventName.includes('pull_request')) {
+            core.info(`Current context ${context.eventName} is not pull_request, skipping comment`);
+            return false;
+        }
+        number = context.payload.pull_request.number;
     }
-    number = context.payload.pull_request.number;
-    core.info(`PR number: ${number}`);
+    core.info(`Commenting on PR: ${owner}/${repo}#${number}`);
 
     async function listComments(page = 1) {
         let { data: comments } = await octokit.issues.listComments({
