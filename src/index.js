@@ -23,6 +23,9 @@ async function comment() {
     }
     if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
+            if (!files[i]) {
+                continue;
+            }
             const content = fs.readFileSync(files[i], 'utf8');
             const lines = content.split('\n');
             const collapse = lines.length > contentCollapseLines;
