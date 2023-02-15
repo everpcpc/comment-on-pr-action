@@ -23,7 +23,7 @@ inputs:
     required: false
   identifier:
     description: Comment body filter
-    required: true
+    required: false
   masks:
     description: "secrets to mask in comment, eg: join(secrets.*)"
     required: false

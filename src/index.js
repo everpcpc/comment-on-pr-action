@@ -72,7 +72,10 @@ async function comment() {
     }
 
     const identifier = core.getInput('identifier');
-    const identifierDoc = `<!-- ${identifier} -->`
+    let identifierDoc = '';
+    if (identifier) {
+        identifierDoc = `<!-- ${identifier} -->`
+    }
 
     body += "\n" + identifierDoc;
 
@@ -103,17 +106,19 @@ async function comment() {
         return comments;
     }
 
-    const commentList = await listComments();
     let comments = [];
-    commentList.forEach(item => {
-        if (item.body.includes(identifierDoc)) {
-            comments.push({
-                id: item.id,
-                auth: item.user.login,
-                body: item.body,
-            });
-        }
-    });
+    if (identifier) {
+        const commentList = await listComments();
+        commentList.forEach(item => {
+            if (item.body.includes(identifierDoc)) {
+                comments.push({
+                    id: item.id,
+                    auth: item.user.login,
+                    body: item.body,
+                });
+            }
+        });
+    }
 
     if (comments.length === 0) {
         const { data } = await octokit.issues.createComment({
