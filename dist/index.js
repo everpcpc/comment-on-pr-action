@@ -13958,6 +13958,10 @@ async function comment() {
         });
     }
     if (comments.length === 0) {
+        if (!body || deleteComment === 'true') {
+            core.info(`No comment found, skipping delete`);
+            return false;
+        }
         const { data } = await octokit.issues.createComment({
             owner,
             repo,
