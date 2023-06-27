@@ -1,5 +1,5 @@
-name: Create/Update Comment on Pull Request
-description: Create/Update Comment on Pull Request
+name: Create/Update/Delete Comment on Pull Request
+description: Create/Update/Delete Comment on Pull Request
 author: everpcpc
 
 inputs:
@@ -23,6 +23,9 @@ inputs:
     required: false
   identifier:
     description: Comment body filter
+    required: false
+  delete:
+    description: Delete comment, requires identifier
     required: false
   masks:
     description: "secrets to mask in comment, eg: join(secrets.*)"

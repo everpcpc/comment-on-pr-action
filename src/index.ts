@@ -1,16 +1,17 @@
-/**
- * Create/Update Comment on Pull Request
- */
-
-const fs = require('fs');
-const core = require('@actions/core');
-const github = require('@actions/github');
-const { Octokit } = require('@octokit/rest');
+import fs from 'fs';
+import core from '@actions/core';
+import github from '@actions/github';
+import { Octokit } from '@octokit/rest';
 
 const token = core.getInput('token');
 const octokit = new Octokit({ auth: `token ${token}` });
 const context = github.context;
 const contentCollapseLines = 36;
+
+interface Comment {
+    id: number;
+    body: string | undefined;
+}
 
 async function comment() {
     let body = core.getInput('body');
@@ -72,6 +73,12 @@ async function comment() {
     }
 
     const identifier = core.getInput('identifier');
+    const deleteComment = core.getInput('delete');
+    if (deleteComment === 'true') {
+        if (!identifier) {
+            throw new Error(`identifier is required when delete is true`);
+        }
+    }
     let identifierDoc = '';
     if (identifier) {
         identifierDoc = `<!-- ${identifier} -->`
@@ -82,17 +89,23 @@ async function comment() {
     const owner = context.repo.owner;
     const repo = context.repo.repo;
 
-    let number = core.getInput('number');
+    const numberInput = core.getInput('number');
+    let number = parseInt(numberInput);
     if (!number) {
         if (!context.eventName.includes('pull_request')) {
             core.info(`Current context ${context.eventName} is not pull_request, skipping comment`);
             return false;
         }
-        number = context.payload.pull_request.number;
+        const pullRequest = context.payload.pull_request;
+        if (!pullRequest) {
+            core.info(`Could not get pull_request from context, skipping comment`);
+            return false;
+        }
+        number = pullRequest.number;
     }
     core.info(`Commenting on PR: ${owner}/${repo}#${number}`);
 
-    async function listComments(page = 1) {
+    async function listComments(page = 1): Promise<Comment[]> {
         let { data: comments } = await octokit.issues.listComments({
             owner,
             repo,
@@ -100,20 +113,25 @@ async function comment() {
             per_page: 100,
             page,
         });
-        if (comments.length >= 100) {
-            comments = comments.concat(await listComments(page + 1));
+        let cmts = comments.map(item => {
+            return {
+                id: item.id,
+                body: item.body,
+            };
+        });
+        if (cmts.length >= 100) {
+            cmts = cmts.concat(await listComments(page + 1));
         }
-        return comments;
+        return cmts;
     }
 
-    let comments = [];
+    let comments: Comment[] = [];
     if (identifier) {
         const commentList = await listComments();
         commentList.forEach(item => {
-            if (item.body.includes(identifierDoc)) {
+            if (item.body?.includes(identifierDoc)) {
                 comments.push({
                     id: item.id,
-                    auth: item.user.login,
                     body: item.body,
                 });
             }
@@ -131,7 +149,7 @@ async function comment() {
         core.setOutput('comment-id', data.id);
     } else if (comments.length === 1) {
         let commentId = comments[0].id;
-        if (!body) {
+        if (!body || deleteComment === 'true') {
             await octokit.issues.deleteComment({
                 owner,
                 repo,
@@ -163,7 +181,8 @@ async function run() {
         try {
             await comment();
         } catch (error) {
-            core.error(error.message);
+            // @ts-ignore
+            core.error(error);
         }
     } else {
         await comment();
