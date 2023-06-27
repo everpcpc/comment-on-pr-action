@@ -1,6 +1,6 @@
 import fs from 'fs';
-import core from '@actions/core';
-import github from '@actions/github';
+import * as core from '@actions/core';
+import * as github from '@actions/github';
 import { Octokit } from '@octokit/rest';
 
 const token = core.getInput('token');

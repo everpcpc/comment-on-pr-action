@@ -13805,23 +13805,46 @@ function wrappy (fn, cb) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
-const core_1 = __importDefault(__nccwpck_require__(2186));
-const github_1 = __importDefault(__nccwpck_require__(5438));
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
 const rest_1 = __nccwpck_require__(5375);
-const token = core_1.default.getInput('token');
+const token = core.getInput('token');
 const octokit = new rest_1.Octokit({ auth: `token ${token}` });
-const context = github_1.default.context;
+const context = github.context;
 const contentCollapseLines = 36;
 async function comment() {
-    let body = core_1.default.getInput('body');
-    const files = core_1.default.getInput('files').split(',');
-    const fileTypes = core_1.default.getInput('file-types').split(',');
-    const fileTitles = core_1.default.getInput('file-titles').split(',');
+    let body = core.getInput('body');
+    const files = core.getInput('files').split(',');
+    const fileTypes = core.getInput('file-types').split(',');
+    const fileTitles = core.getInput('file-titles').split(',');
     if (!(files.length === fileTypes.length && files.length === fileTitles.length)) {
         throw new Error(`files(${files.length}), file-types(${fileTypes.length}) and file-titles(${fileTitles.length}) must have the same length`);
     }
@@ -13862,8 +13885,8 @@ async function comment() {
             }
         }
     }
-    const masks = core_1.default.getInput('masks');
-    const masksSplit = core_1.default.getInput('masks-split');
+    const masks = core.getInput('masks');
+    const masksSplit = core.getInput('masks-split');
     if (masks) {
         let ms = masks.split(masksSplit);
         let ss = ms.map(m => m.trim()).filter(m => m);
@@ -13874,8 +13897,8 @@ async function comment() {
             body = body.replaceAll(ss[s], '***');
         }
     }
-    const identifier = core_1.default.getInput('identifier');
-    const deleteComment = core_1.default.getInput('delete');
+    const identifier = core.getInput('identifier');
+    const deleteComment = core.getInput('delete');
     if (deleteComment === 'true') {
         if (!identifier) {
             throw new Error(`identifier is required when delete is true`);
@@ -13888,21 +13911,21 @@ async function comment() {
     body += "\n" + identifierDoc;
     const owner = context.repo.owner;
     const repo = context.repo.repo;
-    const numberInput = core_1.default.getInput('number');
+    const numberInput = core.getInput('number');
     let number = parseInt(numberInput);
     if (!number) {
         if (!context.eventName.includes('pull_request')) {
-            core_1.default.info(`Current context ${context.eventName} is not pull_request, skipping comment`);
+            core.info(`Current context ${context.eventName} is not pull_request, skipping comment`);
             return false;
         }
         const pullRequest = context.payload.pull_request;
         if (!pullRequest) {
-            core_1.default.info(`Could not get pull_request from context, skipping comment`);
+            core.info(`Could not get pull_request from context, skipping comment`);
             return false;
         }
         number = pullRequest.number;
     }
-    core_1.default.info(`Commenting on PR: ${owner}/${repo}#${number}`);
+    core.info(`Commenting on PR: ${owner}/${repo}#${number}`);
     async function listComments(page = 1) {
         let { data: comments } = await octokit.issues.listComments({
             owner,
@@ -13941,8 +13964,8 @@ async function comment() {
             issue_number: number,
             body,
         });
-        core_1.default.info(`Create comment success!`);
-        core_1.default.setOutput('comment-id', data.id);
+        core.info(`Create comment success!`);
+        core.setOutput('comment-id', data.id);
     }
     else if (comments.length === 1) {
         let commentId = comments[0].id;
@@ -13952,7 +13975,7 @@ async function comment() {
                 repo,
                 comment_id: commentId,
             });
-            core_1.default.info(`Delete comment: [${commentId}] success!`);
+            core.info(`Delete comment: [${commentId}] success!`);
             return false;
         }
         let params = {
@@ -13962,23 +13985,23 @@ async function comment() {
             body: body,
         };
         await octokit.issues.updateComment(params);
-        core_1.default.setOutput('comment-id', commentId);
-        core_1.default.info(`Update comment: [${commentId}] success!`);
+        core.setOutput('comment-id', commentId);
+        core.info(`Update comment: [${commentId}] success!`);
     }
     else {
         let length = comments.length;
-        core_1.default.info(`The comments length is ${length}.`);
+        core.info(`The comments length is ${length}.`);
     }
 }
 async function run() {
-    const allowFailure = core_1.default.getInput('allow-failure');
+    const allowFailure = core.getInput('allow-failure');
     if (allowFailure === 'true') {
         try {
             await comment();
         }
         catch (error) {
             // @ts-ignore
-            core_1.default.error(error);
+            core.error(error);
         }
     }
     else {
