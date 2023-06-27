@@ -11,7 +11,7 @@ inputs:
     required: true
   body:
     description: Comment content
-    required: true
+    required: false
   files:
     description: Additional comment content from file, split by comma
     required: false
