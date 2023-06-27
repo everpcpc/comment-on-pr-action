@@ -1,7 +1,7 @@
 default: build
 
 init:
-	npm install
+	yarn install
 
 build: init
-	ncc build src/index.js -o dist
+	yarn build
