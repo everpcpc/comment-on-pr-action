@@ -1,7 +1,7 @@
 default: build
 
 init:
-	yarn install
+	pnpm install
 
 build: init
-	yarn build
+	pnpm run build
